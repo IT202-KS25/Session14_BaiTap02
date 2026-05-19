@@ -4,7 +4,6 @@ CREATE PROCEDURE TransferBed (
     IN p_new_bed_id INT
 )
 BEGIN
-    START TRANSACTION;
 
     UPDATE Beds
     SET patient_id = NULL
@@ -13,8 +12,6 @@ BEGIN
     UPDATE Beds
     SET patient_id = p_patient_id
     WHERE bed_id = p_new_bed_id;
-
-    COMMIT;
 
 END //
 
@@ -33,8 +30,12 @@ CREATE PROCEDURE TransferBed (
     IN p_new_bed_id INT
 )
 BEGIN
-    START TRANSACTION;
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+		ROLLBACK;
+	END;
 
+    START TRANSACTION;
     -- Thao tác 1: Giải phóng giường cũ
     UPDATE Beds
     SET patient_id = NULL
